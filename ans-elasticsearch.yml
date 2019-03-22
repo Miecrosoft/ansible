@@ -1,0 +1,7 @@
+---
+- name: Setup Elasticsearch
+  hosts: inv-elasticsearch
+  remote_user: root
+
+  roles:
+    - elasticsearch

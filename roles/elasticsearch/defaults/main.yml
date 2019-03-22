@@ -1,0 +1,10 @@
+es_version: 5.6.16
+
+init_heap: 1g
+max_heap: 1g
+
+cluster_name: kimcil-es
+indices_queries: 20%
+indices_requests: 20%
+indices_recovery: 100mb
+action_destructive: "true"

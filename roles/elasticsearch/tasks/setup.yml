@@ -1,0 +1,73 @@
+---
+- name: Update repositories cache and install prerequisite packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - apt-transport-https
+    - htop
+
+- name: Add Oracle JDK repository
+  apt_repository:
+    repo: ppa:webupd8team/java
+
+- name: Accept Oracle Java 8
+  debconf:
+    name: oracle-java8-installer
+    question: shared/accepted-oracle-license-v1-1
+    value: 'true'
+    vtype: select
+
+- name: Install oracle-java8-installer
+  apt:
+    name: oracle-java8-installer
+    state: present
+
+- name: Download elasticsearch-{{ es_version }}.deb package
+  get_url:
+    url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{ es_version }}.deb
+    dest: /root/
+
+- name: Install elasticsearch-{{ es_version }}.deb package
+  apt:
+    deb: /root/elasticsearch-{{ es_version }}.deb
+
+- name: Setup the elasticsearch setting
+  template:
+    src: etc/elasticsearch/elasticsearch.yml
+    dest: /etc/elasticsearch/elasticsearch.yml
+    owner: root
+    group: elasticsearch
+    mode: 0660
+
+- name: Setup the elasticsearch jvm
+  template:
+    src: etc/elasticsearch/jvm.options
+    dest: /etc/elasticsearch/jvm.options
+    owner: root
+    group: elasticsearch
+    mode: 0660
+
+- name: Create elasticsearch.service.d folder for system limits
+  file:
+    path: /etc/systemd/system/elasticsearch.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Setup the system limits in elasticsearch.service.d
+  template:
+    src: etc/systemd/system/elasticsearch.service.d/override.conf
+    dest: /etc/systemd/system/elasticsearch.service.d/override.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Disable Swap memory
+  shell: swapoff -a
+
+  notify:
+    - systemctl daemon-reload
+    - systemctl start elasticsearch.service

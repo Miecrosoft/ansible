@@ -1,0 +1,9 @@
+---
+- name: systemctl daemon-reload
+  systemd:
+    daemon_reload: yes
+
+- name: systemctl start elasticsearch.service
+  systemd:
+    state: started
+    name: elasticsearch

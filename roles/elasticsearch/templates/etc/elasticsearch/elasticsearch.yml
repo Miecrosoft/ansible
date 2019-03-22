@@ -1,0 +1,13 @@
+cluster.name : {{ cluster_name }}
+node.name: {{ ansible_hostname }}
+network.host : "0.0.0.0"
+bootstrap.memory_lock: true
+
+#recovery
+indices.queries.cache.size: {{ indices_queries }}
+indices.requests.cache.size: {{ indices_requests }}
+indices.recovery.max_bytes_per_sec: {{ indices_recovery }}
+# indices.store.throttle.max_bytes_per_sec: 100mb
+
+#prevent delete all indices
+action.destructive_requires_name: {{ action_destructive }}
